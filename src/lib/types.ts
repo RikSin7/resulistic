@@ -15,28 +15,28 @@ import { z } from "zod";
 // ---------- Basics ----------
 const LinkSchema = z.object({
   id: z.string(),
-  label: z.string(),        // "GitHub", "LinkedIn", "Portfolio"
+  label: z.string(), // "GitHub", "LinkedIn", "Portfolio"
   url: z.url(),
-})
+});
 
 const BasicsSchema = z.object({
   name: z.string(),
-  email: z.string().email(),
+  email: z.email().or(z.literal("")),
   phone: z.string().optional(),
-  location: z.string().optional(),     // "Jaipur, India"
+  location: z.string().optional(), // "Jaipur, India"
   links: z.array(LinkSchema).default([]),
-})
+});
 
 // ---------- Shared ----------
 const DateRangeSchema = z.object({
-  start: z.string(),       // "Jan 2024" — keep as string for display flexibility
+  start: z.string(), // "Jan 2024" — keep as string for display flexibility
   end: z.string().nullable(), // null = present
-})
+});
 
 const BulletSchema = z.object({
   id: z.string(),
   text: z.string(),
-})
+});
 
 // ---------- Experience ----------
 const ExperienceEntrySchema = z.object({
@@ -46,31 +46,31 @@ const ExperienceEntrySchema = z.object({
   location: z.string().optional(),
   dates: DateRangeSchema,
   bullets: z.array(BulletSchema).default([]),
-})
+});
 
 export const ExperienceSectionSchema = z.object({
   id: z.string(),
-  type: z.literal('experience'),
-  title: z.string().default('Experience'),
+  type: z.literal("experience"),
+  title: z.string().default("Experience"),
   entries: z.array(ExperienceEntrySchema).default([]),
-})
+});
 
 // ---------- Education ----------
 const EducationEntrySchema = z.object({
   id: z.string(),
   institution: z.string(),
-  degree: z.string(),      // "B.Tech"
-  field: z.string().optional(),   // "Computer Science"
+  degree: z.string(), // "B.Tech"
+  field: z.string().optional(), // "Computer Science"
   dates: DateRangeSchema,
   details: z.string().optional(), // "CGPA: 8.5"
-})
+});
 
 export const EducationSectionSchema = z.object({
   id: z.string(),
-  type: z.literal('education'),
-  title: z.string().default('Education'),
+  type: z.literal("education"),
+  title: z.string().default("Education"),
   entries: z.array(EducationEntrySchema).default([]),
-})
+});
 
 // ---------- Projects ----------
 const ProjectEntrySchema = z.object({
@@ -80,91 +80,101 @@ const ProjectEntrySchema = z.object({
   techStack: z.array(z.string()).default([]),
   link: z.url().optional(),
   bullets: z.array(BulletSchema).default([]),
-})
+});
 
 export const ProjectSectionSchema = z.object({
   id: z.string(),
-  type: z.literal('projects'),
-  title: z.string().default('Projects'),
+  type: z.literal("projects"),
+  title: z.string().default("Projects"),
   entries: z.array(ProjectEntrySchema).default([]),
-})
+});
 
 // ---------- Skills ----------
 const SkillEntrySchema = z.object({
   id: z.string(),
-  category: z.string(),    // "Languages", "Frameworks", "Tools"
+  category: z.string(), // "Languages", "Frameworks", "Tools"
   items: z.array(z.string()).default([]),
-})
+});
 
 export const SkillsSectionSchema = z.object({
   id: z.string(),
-  type: z.literal('skills'),
-  title: z.string().default('Skills'),
+  type: z.literal("skills"),
+  title: z.string().default("Skills"),
   entries: z.array(SkillEntrySchema).default([]),
-})
+});
 
 // ---------- Custom ----------
 const CustomEntrySchema = z.object({
   id: z.string(),
   title: z.string(),
-  description: z.string(),
-})
+  subtitle: z.string().optional(),
+  description: z.string().optional(),
+  bullets: z.array(BulletSchema).default([]),
+});
 
 export const CustomSectionSchema = z.object({
   id: z.string(),
-  type: z.literal('custom'),
-  title: z.string().default('Custom'),
+  type: z.literal("custom"),
+  title: z.string().default("Custom"),
   entries: z.array(CustomEntrySchema).default([]),
-})
+});
 
 // ---------- The discriminated union ----------
-export const ResumeSectionSchema = z.discriminatedUnion('type', [
+export const ResumeSectionSchema = z.discriminatedUnion("type", [
   ExperienceSectionSchema,
   EducationSectionSchema,
   ProjectSectionSchema,
   SkillsSectionSchema,
   CustomSectionSchema,
-])
+]);
 
 // ---------- Meta ----------
 const ResumeMetaSchema = z.object({
-  template: z.string().default('ats-clean'),
-  accentColor: z.string().default('#1a1a1a'),
-  fontSize: z.enum(['small', 'medium', 'large']).default('medium'),
-})
+  template: z.string().default("ats-clean"),
+  accentColor: z.string().default("#1a1a1a"),
+  fontSize: z.enum(["small", "medium", "large"]).default("medium"),
+});
 
 // ---------- The full ResumeDocument (actual resume content, not the mongoDB document itself) ----------
 export const ResumeSchema = z.object({
-  title: z.string().default('Untitled Resume'),
+  title: z.string().default("Untitled Resume"),
   basics: BasicsSchema,
   sections: z.array(ResumeSectionSchema).default([]),
   meta: ResumeMetaSchema,
-})
+});
 
 // ---------- Derived TypeScript types ----------
 // These are what you import across the app. The schema is the
 // source of truth; the types are inferred from it — no duplicate
 // type definitions.
 
-export type Link = z.infer<typeof LinkSchema>
-export type Basics = z.infer<typeof BasicsSchema>
-export type DateRange = z.infer<typeof DateRangeSchema>
-export type Bullet = z.infer<typeof BulletSchema>
+export type Link = z.infer<typeof LinkSchema>;
+export type Basics = z.infer<typeof BasicsSchema>;
+export type DateRange = z.infer<typeof DateRangeSchema>;
+export type Bullet = z.infer<typeof BulletSchema>;
 
-export type ExperienceEntry = z.infer<typeof ExperienceEntrySchema>
-export type EducationEntry = z.infer<typeof EducationEntrySchema>
-export type ProjectEntry = z.infer<typeof ProjectEntrySchema>
-export type SkillEntry = z.infer<typeof SkillEntrySchema>
-export type CustomEntry = z.infer<typeof CustomEntrySchema>
+export type ExperienceEntry = z.infer<typeof ExperienceEntrySchema>;
+export type EducationEntry = z.infer<typeof EducationEntrySchema>;
+export type ProjectEntry = z.infer<typeof ProjectEntrySchema>;
+export type SkillEntry = z.infer<typeof SkillEntrySchema>;
+export type CustomEntry = z.infer<typeof CustomEntrySchema>;
 
-export type ExperienceSection = z.infer<typeof ExperienceSectionSchema>
-export type EducationSection = z.infer<typeof EducationSectionSchema>
-export type ProjectSection = z.infer<typeof ProjectSectionSchema>
-export type SkillsSection = z.infer<typeof SkillsSectionSchema>
-export type CustomSection = z.infer<typeof CustomSectionSchema>
+export type ExperienceSection = z.infer<typeof ExperienceSectionSchema>;
+export type EducationSection = z.infer<typeof EducationSectionSchema>;
+export type ProjectSection = z.infer<typeof ProjectSectionSchema>;
+export type SkillsSection = z.infer<typeof SkillsSectionSchema>;
+export type CustomSection = z.infer<typeof CustomSectionSchema>;
 
-export type ResumeSection = z.infer<typeof ResumeSectionSchema>
-export type ResumeDocument = z.infer<typeof ResumeSchema>
+export type ResumeSection = z.infer<typeof ResumeSectionSchema>;
+export type ResumeDocument = z.infer<typeof ResumeSchema>;
+
+export type ResumeEntry =
+  | ExperienceEntry
+  | EducationEntry
+  | ProjectEntry
+  | SkillEntry
+  | CustomEntry
+
 
 // ============================================================
 // AI SUGGESTION SCHEMA
@@ -174,21 +184,21 @@ export type ResumeDocument = z.infer<typeof ResumeSchema>
 
 const SuggestionTargetSchema = z.object({
   sectionId: z.string(),
-  entryId: z.string().optional(),      // which experience/education/project entry
-  bulletId: z.string().optional(),     // if targeting a specific bullet
-})
+  entryId: z.string().optional(), // which experience/education/project entry
+  bulletId: z.string().optional(), // if targeting a specific bullet
+});
 
 export const SuggestionSchema = z.object({
   id: z.string(),
-  type: z.enum(['rewrite', 'add', 'remove']),
+  type: z.enum(["rewrite", "add", "remove"]),
   target: SuggestionTargetSchema,
-  current: z.string().optional(),       // current text (for rewrite/remove)
-  suggested: z.string(),               // new text or the text to add
-  reason: z.string(),                  // why this change helps match the JD
+  current: z.string().optional(), // current text (for rewrite/remove)
+  suggested: z.string(), // new text or the text to add
+  reason: z.string(), // why this change helps match the JD
   factCheckWarning: z.boolean().default(false), // flagged by fact-checker
-})
+});
 
-export type Suggestion = z.infer<typeof SuggestionSchema>
+export type Suggestion = z.infer<typeof SuggestionSchema>;
 
 // ============================================================
 // ATS SCORECARD SCHEMA
@@ -197,15 +207,15 @@ export type Suggestion = z.infer<typeof SuggestionSchema>
 // ============================================================
 
 const AtsCheckSchema = z.object({
-  name: z.string(),                     // "Text extractability"
+  name: z.string(), // "Text extractability"
   passed: z.boolean(),
-  score: z.number(),                    // points earned for this check
+  score: z.number(), // points earned for this check
   maxScore: z.number(),
-  detail: z.string(),                   // human-readable explanation
-})
+  detail: z.string(), // human-readable explanation
+});
 
 export const ScorecardSchema = z.object({
-  overallScore: z.number(),             // sum of all check scores
+  overallScore: z.number(), // sum of all check scores
   checks: z.array(AtsCheckSchema),
   keywordOverlap: z
     .object({
@@ -213,10 +223,10 @@ export const ScorecardSchema = z.object({
       missing: z.array(z.string()),
     })
     .optional(),
-})
+});
 
-export type AtsCheck = z.infer<typeof AtsCheckSchema>
-export type Scorecard = z.infer<typeof ScorecardSchema>
+export type AtsCheck = z.infer<typeof AtsCheckSchema>;
+export type Scorecard = z.infer<typeof ScorecardSchema>;
 
 // ============================================================
 // HELPER: Create an empty resume (useful for "Create Resume" flow)
@@ -224,36 +234,48 @@ export type Scorecard = z.infer<typeof ScorecardSchema>
 
 export function createEmptyResume(): ResumeDocument {
   return ResumeSchema.parse({
-    title: 'Untitled Resume',
+    title: "Untitled Resume",
     basics: {
-      name: '',
-      email: '',
+      name: "",
+      email: "",
       links: [],
     },
     sections: [
       {
         id: crypto.randomUUID(),
-        type: 'experience',
-        title: 'Experience',
+        type: "experience",
+        title: "Experience",
         entries: [],
       },
       {
         id: crypto.randomUUID(),
-        type: 'education',
-        title: 'Education',
+        type: "education",
+        title: "Education",
         entries: [],
       },
       {
         id: crypto.randomUUID(),
-        type: 'skills',
-        title: 'Skills',
+        type: "skills",
+        title: "Skills",
         entries: [],
       },
     ],
     meta: {
-      template: 'ats-clean',
-      accentColor: '#1a1a1a',
-      fontSize: 'medium',
+      template: "ats-clean",
+      accentColor: "#1a1a1a",
+      fontSize: "medium",
     },
-  })
+  });
+}
+
+export type BulletSection = ExperienceSection | ProjectSection | CustomSection;
+
+export function isBulletSection(
+  section: ResumeSection,
+): section is BulletSection {
+  return (
+    section.type === "experience" ||
+    section.type === "projects" ||
+    section.type === "custom"
+  );
 }

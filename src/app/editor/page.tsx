@@ -1,6 +1,6 @@
-import { ResumeEditor } from "@/components/editor/ResumeEditor";
 import { JdInput } from "@/components/ai/JdInput";
 import { SuggestionPanel } from "@/components/ai/SuggestionPanel";
+import ResumeEditor from "@/components/editor/ResumeEditor";
 import { ResumePreview } from "@/components/preview/ResumePreview";
 import { AtsScorecard } from "@/components/quality/AtsScorecard";
 
